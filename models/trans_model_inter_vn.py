@@ -240,6 +240,7 @@ class TransBaseModel(nn.Module):
     def visual_step(self, x, x_length):
         visual_feat = self.visual_backbone(x) # B C T V -> B T C
         visual_feat = self.visual_project(visual_feat)
+        # print(f"DEBUG: x shape: {x.shape}, visual_feat shape: {visual_feat.shape}")
 
         if self.args.pe_enc:
             visual_feat = self.pos_embed(visual_feat)
@@ -259,6 +260,10 @@ class TransBaseModel(nn.Module):
             mask = None, 
             src_key_padding_mask = visual_padding_mask,
         ) # [B, L, C]
+
+        # Ensure mask matches output length (handles nested tensor truncation)
+        if visual_padding_mask is not None:
+            visual_padding_mask = visual_padding_mask[:, :encoder_out.shape[1]]
 
         return encoder_out, length_scaled, visual_padding_mask
     

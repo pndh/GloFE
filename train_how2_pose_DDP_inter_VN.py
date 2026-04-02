@@ -63,7 +63,7 @@ class How2SignPoseDataset(Dataset):
         self.video_names = list(data_frame['SENTENCE_NAME'])
 
         # filter out missing parts
-        with open('/mnt/user/E-linkezhou.lkz-385206/workspace/How2Sign/tools/how2sign_missing.txt', 'r') as f:
+        with open('data/How2Sign/how2sign_missing.txt', 'r') as f:
             names = f.readlines()
             missing = [x.strip() for x in names]
         vid_filtered, trans_filtered = [], []
@@ -207,7 +207,7 @@ class How2SignPoseDataset(Dataset):
     
     def get_vn(self, index: int):
         vid = self.video_names[index]
-        vns = self.matched_VNs[vid]
+        vns = self.matched_VNs.get(vid, ['call', 'elements', 'do', 'color', 'page', 'have', 'meaning', 'life', 'beautiful', 'become'])
         vn_idxs = [self.vn_to_idx[x] for x in vns]
         vn_idxs =  torch.tensor(vn_idxs, dtype=torch.int64)
         vn_len = len(vn_idxs)
@@ -262,13 +262,9 @@ def init_logging(output_dir, reuse=False):
     tb_log_dir = os.path.join(output_dir, "tb_logs")
     if os.path.isdir(tb_log_dir) and not reuse:
         print('Dir existed: ', tb_log_dir)
-        answer = input('Delete it? y/n:')
-        if answer == 'y':
-            shutil.rmtree(tb_log_dir)
-            print('Dir removed: ', tb_log_dir)
-            input('Refresh the website of tensorboard by pressing any keys')
-        else:
-            print('Dir not removed: ', tb_log_dir)
+        # Automatically remove existing tb_logs if not resuming
+        shutil.rmtree(tb_log_dir)
+        print('Dir removed: ', tb_log_dir)
     train_writer = SummaryWriter(os.path.join(tb_log_dir, 'train'), 'train')
     return train_writer
 

@@ -1,1 +1,61 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS-specific files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Project-specific: data and checkpoints
+data/
+work_dir/
+figs/
+*.pth
+*.ckpt
+*.h5
+*.model
+*.weights
+*.pt
+
+# Logs
+*.log
+train_out.log
+
+# Archives
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Data files (often large or generated)
+*.pkl
+*.npy
+*.npz
+*.csv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Caches
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

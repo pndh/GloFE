@@ -64,6 +64,8 @@ class InterSampleContrastiveLoss(nn.Module):
         """
         # filter by number of matched vns
         f_idxs = (vn_len > self.matched_thresh).nonzero().squeeze(-1)
+        if f_idxs.numel() == 0:
+            return torch.tensor(0.0, device=visual_feat.device, requires_grad=True).mean()
         visual_feat, visual_feat_len, vns, vn_len = visual_feat[f_idxs], visual_feat_len[f_idxs], vns[f_idxs], vn_len[f_idxs]
         
         # clip max_vn to reduce redundent calculation
