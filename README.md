@@ -144,6 +144,35 @@ torchrun --nnodes=1 --nproc_per_node=$GPUS train_openasl_pose_DDP_inter_VN.py \
     --inter_cl_we_path "notebooks/openasl-v1.0/uncased_filtred_glove_VN_embed.pkl"
 ```
 
+## Vietnamese CSLR Adaptation (Group 1)
+We have adapted GloFE for the Vietnamese CSLR dataset using the PhoBERT tokenizer and custom feature extraction.
+
+### 1. Data Preparation
+Run the preparation script to generate PhoBERT tokenizers, Vietnamese word indices, and word embeddings:
+```bash
+python prepare_cslr_data.py \
+    --data_root /path/to/CSLR_dataset/Group1 \
+    --output_dir notebooks/cslr-v1.0
+```
+
+### 2. Pose Extraction
+Use the specialized extraction script for CSLR. It supports a `--no-det` mode to bypass person detection by using the full frame, which is faster and more robust for centered signers:
+```bash
+python tools/extract_cslr_mmpose.py \
+    configs/faster_rcnn_r50_fpn_1x_coco.py \
+    checkpoints/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth \
+    --pose-config configs/hrnet_w48_coco_wholebody_384x288_dark.py \
+    --no-det --device cuda:0 \
+    --output-root /path/to/CSLR_dataset/Group1/mmpose
+```
+
+### 3. Training
+A pre-configured training shell script is provided:
+```bash
+bash scripts/cslr/train_cslr.sh
+```
+Adjust `DATASET_ROOT` inside the script to match your local path.
+
 ## Miscs
 If you plan to run GloFE on other datasets, here are the instructions on how to:
 - train the BPE tokenizer

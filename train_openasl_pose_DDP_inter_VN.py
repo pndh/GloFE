@@ -69,16 +69,20 @@ class OpenASLPoseDataset(Dataset):
         self.translation = df_filtered['raw-text'].to_list()
         self.video_names = df_filtered['vid'].to_list()
         
-        self.vn_vocab = 5523
-        self.matched_VNs = json.load(open('notebooks/openasl-v1.0/uncased_filtred_glove_VN_matched_train.json', 'r'))
+        self.vn_vocab = arg_dict.get('inter_cl_vocab', 5523)
+        vn_matched_path = arg_dict.get('vn_matched_path', 'notebooks/openasl-v1.0/uncased_filtred_glove_VN_matched_train.json')
+        vn_idxs_path = arg_dict.get('vn_idxs_path', 'notebooks/openasl-v1.0/uncased_filtred_glove_VN_idxs.txt')
+        
+        self.matched_VNs = json.load(open(vn_matched_path, 'r'))
         self.vn_to_idx = {}
-        with open('notebooks/openasl-v1.0/uncased_filtred_glove_VN_idxs.txt', 'r') as f:
+        with open(vn_idxs_path, 'r') as f:
             content = f.readlines()
             for line in content:
                 items = line.strip().split(' ')
-                self.vn_to_idx[items[1]] = int(items[0])
+                if len(items) >= 2:
+                    self.vn_to_idx[items[1]] = int(items[0])
         vn_lens = [len(v) for _,v in self.matched_VNs.items()]
-        self.max_vns = max(vn_lens)
+        self.max_vns = max(vn_lens) if vn_lens else 0
 
         self.translation_token_ids = []  # encoded indices
         for trans in self.translation:
@@ -554,6 +558,14 @@ def main():
                         help='max generated token number for decoder')
     parser.add_argument('--num_beams', type=int, default=5,
                         help='number of beams for beam search during inference')
+    
+    # Vietnamese artifacts
+    parser.add_argument('--vn_matched_path', type=str, 
+                        default='notebooks/openasl-v1.0/uncased_filtred_glove_VN_matched_train.json',
+                        help='path to vn matched json')
+    parser.add_argument('--vn_idxs_path', type=str,
+                        default='notebooks/openasl-v1.0/uncased_filtred_glove_VN_idxs.txt',
+                        help='path to vn idxs mapping txt')
 
     # Model related arguments
     parser = TransBaseModel.add_args(parser)  # add model related arguments
